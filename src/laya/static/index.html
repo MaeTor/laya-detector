@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>laya — evidence consistency</title>
+  <meta name="description" content="Score testimony against retrieved sources: contradiction and evasion, with decider-2b.">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar__inner">
+      <span class="brand">laya</span>
+      <span class="topbar__meta">decider-2b · evidence consistency</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="scope">Scores how testimony compares with retrieved sources and how directly questions are answered.
+      They do <strong>not</strong> measure truthfulness or intent.</p>
+
+    <ol class="steps" aria-label="Progress">
+      <li class="steps__item" data-step="1" aria-current="step"><span class="steps__num">1</span> Testimony</li>
+      <li class="steps__item" data-step="2"><span class="steps__num">2</span> Speakers</li>
+      <li class="steps__item" data-step="3"><span class="steps__num">3</span> Results</li>
+    </ol>
+
+    <div id="error" class="banner banner--error" role="alert" hidden>
+      <span id="error-text"></span>
+      <button type="button" class="btn btn--quiet" id="error-dismiss">Dismiss</button>
+    </div>
+
+    <!-- Step 1 -->
+    <section id="step-1" class="card" aria-labelledby="s1-title">
+      <h1 id="s1-title" class="h2">Testimony</h1>
+      <div class="tabs" role="tablist" aria-label="Input type">
+        <button type="button" role="tab" class="tabs__tab" id="tab-text" aria-controls="panel-text" aria-selected="true">Text</button>
+        <button type="button" role="tab" class="tabs__tab" id="tab-audio" aria-controls="panel-audio" aria-selected="false" tabindex="-1">Audio</button>
+      </div>
+
+      <form id="input-form" novalidate>
+        <div id="panel-text" role="tabpanel" aria-labelledby="tab-text">
+          <label class="field__label" for="text">Transcript</label>
+          <textarea id="text" name="text" rows="9" aria-describedby="text-help"
+                    placeholder="Q: Where were you on the night of the 4th?&#10;A: At home. Obama was the first black president in USA history."></textarea>
+          <p class="field__help" id="text-help">One line per turn. Start interviewer lines with <kbd>Q:</kbd> and answers with <kbd>A:</kbd>. English text.</p>
+        </div>
+
+        <div id="panel-audio" role="tabpanel" aria-labelledby="tab-audio" hidden>
+          <label class="field__label" for="audio">Recording</label>
+          <input id="audio" name="audio" type="file" accept="audio/*,video/*" aria-describedby="audio-help">
+          <p class="field__help" id="audio-help">Any language Whisper supports. It is transcribed and translated to English on this machine.</p>
+          <label class="field__label" for="whisper-size">Transcription model</label>
+          <select id="whisper-size" name="whisper_size" aria-describedby="size-help">
+            <option value="tiny">tiny — fastest</option>
+            <option value="base">base</option>
+            <option value="small" selected>small — balanced</option>
+            <option value="medium">medium — most accurate</option>
+          </select>
+          <p class="field__help" id="size-help">Larger models translate better and run slower.</p>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn--primary" id="to-speakers">Continue</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Step 2 -->
+    <section id="step-2" class="card" aria-labelledby="s2-title" hidden>
+      <h2 id="s2-title" class="h2">Speakers</h2>
+      <p class="field__help">Mark who is speaking in each segment. Evasion is scored on interviewer → witness turns; claims come from witness segments.</p>
+      <ul id="segments" class="segments"></ul>
+      <div class="actions">
+        <button type="button" class="btn btn--secondary" id="back-1">Back</button>
+        <button type="button" class="btn btn--primary" id="run">Analyze</button>
+      </div>
+    </section>
+
+    <!-- Step 3 -->
+    <section id="step-3" aria-labelledby="s3-title" hidden>
+      <div class="results-head">
+        <h2 id="s3-title" class="h2">Results</h2>
+        <button type="button" class="btn btn--secondary" id="restart">New analysis</button>
+      </div>
+      <div id="calibration" class="banner banner--warn" hidden></div>
+      <ul id="notes" class="notes"></ul>
+
+      <h3 class="h3">Claims</h3>
+      <p class="field__help">Per-source bars are decider-2b probabilities. The verdict follows the strongest source; unsourced LLM text counts half.</p>
+      <ul id="claims" class="claims"></ul>
+
+      <h3 class="h3">Evasion</h3>
+      <ul id="evasion" class="evasion"></ul>
+
+      <details class="raw">
+        <summary>Raw report (JSON)</summary>
+        <pre id="raw"></pre>
+      </details>
+    </section>
+
+    <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+  </main>
+
+  <script src="/static/app.js" type="module"></script>
+</body>
+</html>

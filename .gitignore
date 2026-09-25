@@ -1,0 +1,40 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Private docs and local agent config
+docs/
+.claude/
+CLAUDE.md
+AGENTS.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local runtime output
+calibration.json
+*.jsonl
+report*.json
+segs*.json
+*.m4a
+*.mp3
+*.wav
+*.ogg
+*.flac
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+*.swp
